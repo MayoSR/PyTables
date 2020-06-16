@@ -80,14 +80,14 @@ class Table(object):
     def display(self):
         self.check_max_cell_size_by_column()
         print(color_map[self.border_color]+"+"+(sum([i+2 for i in self.max_cell_size_by_column]) +
-                                                self.table_len - 1)*"-"+"+"+color_map["reset"])
+                                                self.table_len - 1)*"-"+"+")
         for i in enumerate(self.table):
             for j in enumerate(i[1]):
-                print("| "+j[1].get_text()+" " *
-                      (self.max_cell_size_by_column[j[0]] - j[1].get_text_length() + 1), end="")
+                print("| "+j[1].get_pretty_text()+" " *
+                      (self.max_cell_size_by_column[j[0]] - j[1].get_text_length())+ background_map["reset"]+" ", end="")
             print("|")
             print(color_map[self.border_color]+"+"+(sum([i+2 for i in self.max_cell_size_by_column]
-                                                        )+self.table_len - 1)*"-"+"+"+color_map["reset"])
+                                                        )+self.table_len - 1)*"-"+"+")
 
 
 class TableCell(object):
@@ -98,6 +98,7 @@ class TableCell(object):
         self.bg = bg
         self.style = style
         self.header = header
+        self.pretty_text = None
         self.set_styles_to_text()
 
     def get_text_length(self):
@@ -107,10 +108,14 @@ class TableCell(object):
         return str(self.text)
 
     def set_styles_to_text(self):
-        self.text = self.color + self.bg + \
-            self.style + self.text + color_map["reset"]
+        self.pretty_text = color_map[self.color] + background_map[self.bg] + \
+            brightness_map[self.style] + self.text + color_map["reset"]
+            
+    def get_pretty_text(self):
+        return self.pretty_text
 
     def set_text(self, text):
+        self.pretty_text.replace(self.text,text)
         self.text = text
         self.set_styles_to_text()
 
