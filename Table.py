@@ -66,24 +66,22 @@ class Table(object):
         self.constraint_map = {}
     
     def add_constraint(self,fn,col):
-        if col in self.constraint_map:
-            self.constraint_map[col].append(fn)
-        else:
-            self.constraint_map[col] = [fn]
+        for i in col: 
+            if i in self.constraint_map:
+                self.constraint_map[i].append(fn)
+            else:
+                self.constraint_map[i] = [fn]
 
     def get_transpose(self):
         transpose = {}
-        col_ind = 0
-        while col_ind < len(self.table):
-            row = []
-            for i in self.table:
-                row.append(i[col_ind])
-            transpose[row[0].get_text()] =  row
-            col_ind+=1
+        col_ind = [[j.get_text() for j in self.table[0]].index(i) for i in self.constraint_map.keys()]
+        for i in col_ind:
+            transpose[self.table[0][i].get_text()] =  [self.table[j][i] for j in range(len(self.table))]
         return transpose
     
     def set_table_constraints(self):
         x_mat = self.get_transpose()
+        print(x_mat)
         for i in self.constraint_map:
             for j in self.constraint_map[i]:
                 x_mat[i].pop(0)
@@ -159,15 +157,18 @@ class TableCell(object):
 
 def constraint(node):
 
-    if int(node.get_text()) > 10000:
-        node.set_color("GREEN")
-    elif  int(node.get_text()) < 1000:
-        node.set_color("RED")
+    try:
+        if int(node.get_text()) > 10000:
+            node.set_color("GREEN")
+        elif  int(node.get_text()) < 1000:
+            node.set_color("RED")
+    except:
+        pass
 
             
 
 table = Table(["hello", "world", "what", "is", "happening"])
-table.add_constraint(constraint,"world")
+table.add_constraint(constraint,["hello","world","happening"])
 table.add_row(["23", "43", "55", "112", "42545"])
 table.add_row(["22333", "3445", "None", "23434", "545555"])
 table.add_row(["2352455", "79797", "9998", "2352455", "213422"])
