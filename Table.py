@@ -1,6 +1,7 @@
 import colorama
 from colorama import Fore, Style, Back
 import random
+import abc
 
 color_map = {
     "WHITE": Fore.WHITE,
@@ -62,11 +63,35 @@ class Table(object):
         self.header_color = "WHITE"
         self.border_color = "WHITE"
         self.background_color = None
+        self.constraint_map = {}
+    
+    def add_constraint(self,fn,col):
+        if col in self.constraint_map:
+            self.constraint_map[col].append(fn)
+        else:
+            self.constraint_map[col] = [fn]
 
+    def get_transpose(self):
+        transpose = {}
+        col_ind = 0
+        while col_ind < len(self.table):
+            row = []
+            for i in self.table:
+                row.append(i[col_ind])
+            transpose[row[0].get_text()] =  row
+            col_ind+=1
+        return transpose
+    
+    def set_table_constraints(self):
+        x_mat = self.get_transpose()
+        for i in self.constraint_map:
+            for j in self.constraint_map[i]:
+                x_mat[i].pop(0)
+                for k in x_mat[i]:
+                    j(k)
+                
     def add_row(self, row, header=False):
-
-        self.table.append([TableCell(header, i, random.choice(list(color_map.keys())), random.choice(
-            list(background_map.keys())), random.choice(list(brightness_map.keys()))) for i in row])
+        self.table.append([TableCell(header, i) for i in row])
 
     def check_max_cell_size_by_column(self):
 
@@ -78,6 +103,7 @@ class Table(object):
                 col_ind += 1
 
     def display(self):
+        self.set_table_constraints()
         self.check_max_cell_size_by_column()
         print(color_map[self.border_color]+"+"+(sum([i+2 for i in self.max_cell_size_by_column]) +
                                                 self.table_len - 1)*"-"+"+")
@@ -92,7 +118,7 @@ class Table(object):
 
 class TableCell(object):
 
-    def __init__(self, header, text, color=default_color_set, bg=default_color_set, style=default_color_set):
+    def __init__(self, header, text, color="WHITE", bg="BLACK", style="NORMAL"):
         self.text = text
         self.color = color
         self.bg = bg
@@ -100,7 +126,7 @@ class TableCell(object):
         self.header = header
         self.pretty_text = None
         self.set_styles_to_text()
-
+        
     def get_text_length(self):
         return len(self.text)
 
@@ -131,8 +157,17 @@ class TableCell(object):
         self.style = style
         self.set_styles_to_text()
 
+def constraint(node):
+
+    if int(node.get_text()) > 10000:
+        node.set_color("GREEN")
+    elif  int(node.get_text()) < 1000:
+        node.set_color("RED")
+
+            
 
 table = Table(["hello", "world", "what", "is", "happening"])
+table.add_constraint(constraint,"world")
 table.add_row(["23", "43", "55", "112", "42545"])
 table.add_row(["22333", "3445", "None", "23434", "545555"])
 table.add_row(["2352455", "79797", "9998", "2352455", "213422"])
