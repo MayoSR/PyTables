@@ -1,7 +1,5 @@
 import colorama
 from colorama import Fore, Style, Back
-import random
-import abc
 
 color_map = {
     "WHITE": Fore.WHITE,
@@ -20,7 +18,7 @@ color_map = {
     "LIGHTRED": Fore.LIGHTRED_EX,
     "LIGHTWHITE": Fore.LIGHTWHITE_EX,
     "LIGHTYELLOW": Fore.LIGHTYELLOW_EX,
-    "reset": Fore.RESET
+    "RESET": Fore.RESET
 }
 
 brightness_map = {
@@ -46,7 +44,7 @@ background_map = {
     "LIGHTRED": Back.LIGHTRED_EX,
     "LIGHTWHITE": Back.LIGHTWHITE_EX,
     "LIGHTYELLOW": Back.LIGHTYELLOW_EX,
-    "reset": Back.RESET
+    "RESET": Back.RESET
 }
 
 default_color_set = Fore.WHITE
@@ -81,7 +79,6 @@ class Table(object):
     
     def set_table_constraints(self):
         x_mat = self.get_transpose()
-        print(x_mat)
         for i in self.constraint_map:
             for j in self.constraint_map[i]:
                 x_mat[i].pop(0)
@@ -108,7 +105,7 @@ class Table(object):
         for i in enumerate(self.table):
             for j in enumerate(i[1]):
                 print("| "+j[1].get_pretty_text()+" " *
-                      (self.max_cell_size_by_column[j[0]] - j[1].get_text_length())+ background_map["reset"]+" ", end="")
+                      (self.max_cell_size_by_column[j[0]] - j[1].get_text_length())+ background_map["RESET"]+" ", end="")
             print("|")
             print(color_map[self.border_color]+"+"+(sum([i+2 for i in self.max_cell_size_by_column]
                                                         )+self.table_len - 1)*"-"+"+")
@@ -133,7 +130,7 @@ class TableCell(object):
 
     def set_styles_to_text(self):
         self.pretty_text = color_map[self.color] + background_map[self.bg] + \
-            brightness_map[self.style] + self.text + color_map["reset"]
+            brightness_map[self.style] + self.text + color_map["RESET"]
             
     def get_pretty_text(self):
         return self.pretty_text
@@ -154,6 +151,7 @@ class TableCell(object):
     def set_style(self, style):
         self.style = style
         self.set_styles_to_text()
+
 
 def constraint(node):
 
